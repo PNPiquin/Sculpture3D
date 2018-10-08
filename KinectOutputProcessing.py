@@ -12,3 +12,12 @@ def color_array_to_rgb_matrix(color_arr, width=1920, height=1080):
                                 color_arr[(h*width + w) * 4 + 1],
                                 color_arr[(h*width + w) * 4 + 2]]]
     return color_matrix
+
+
+def value_normalization(v, v_min=500, v_max=800):
+    if v < v_min:
+        return 0
+    elif v > v_max:
+        return 255
+    else:
+        return 255 * (v-v_min) / (v_max - v_min)

@@ -3,6 +3,8 @@ from pykinect2.PyKinectV2 import *
 from pykinect2 import PyKinectRuntime
 import time
 import matplotlib.pyplot as plt
+import KinectOutputProcessing as kop
+
 
 def norm(x):
     if x < 550:
@@ -18,8 +20,8 @@ if __name__ == '__main__':
     kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Color)
     frame = []
     while True:
-        if kinect.has_new_color_frame():
-            frame = kinect.get_last_color_frame()
+        if kinect.has_new_depth_frame():
+            frame = kinect.get_last_depth_frame()
             print(frame)
             print(len(frame))
             break
@@ -27,15 +29,9 @@ if __name__ == '__main__':
             print('No frame')
             time.sleep(0.1)
 
-    with open('frame.txt', 'w') as f:
-        f.write(str(frame.tolist()))
+    # m = kop.color_array_to_rgb_matrix(frame)
+    frame_norm = [kop.value_normalization(v, 620, 750) for v in frame]
+    m = kop.depth_array_to_matrix(frame_norm)
 
-    width = 1920
-    height = 1080
-    m = []
-    # for k in range(3):
-    #     offset = k * width * height
-    #     m += [[[(frame[i * width + j + offset]) for j in range(width)] for i in range(height)]]
-    m = [[(frame[(i * width + j) * 4]) for j in range(width)] for i in range(height)]
     plt.imshow(m)
     plt.show()
