@@ -16,9 +16,6 @@ def otsu_segmentation(mat):
         histogram += [float(hist[k]) / n_pixels]
 
     hist[0] = 0
-    print(histogram)
-    plt.hist(mat.flatten(), 256, [0, max_])
-    plt.show()
 
     p1_k = {}
     mean_k = {}

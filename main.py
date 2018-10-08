@@ -41,9 +41,10 @@ if __name__ == '__main__':
     plt.imshow(m_depth_resized)
     plt.show()
 
-    print(otsu_segmentation(m_depth_resized))
+    otsu_thresh = otsu_segmentation(m_depth_resized)
+    print(otsu_thresh)
 
-    quantiles = kop.matrix_quantile(m_depth_resized)
+    quantiles = kop.matrix_quantile(m_depth_resized, max_value=otsu_thresh)
     print(quantiles)
     for i in range(len(m_depth_resized)):
         for j in range(len(m_depth_resized[0])):
