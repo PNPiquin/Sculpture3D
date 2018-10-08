@@ -1,37 +1,40 @@
 from pykinect2 import PyKinectV2
-from pykinect2.PyKinectV2 import *
 from pykinect2 import PyKinectRuntime
 import time
 import matplotlib.pyplot as plt
 import KinectOutputProcessing as kop
-
-
-def norm(x):
-    if x < 550:
-        return 550
-    elif x > 750:
-        return 750
-    else:
-        return x
+import cv2
 
 
 if __name__ == '__main__':
     print('Coucou')
     kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Color)
-    frame = []
+    color_frame = []
+    depth_frame = []
+    has_depth = False
+    has_color = False
     while True:
-        if kinect.has_new_depth_frame():
-            frame = kinect.get_last_depth_frame()
-            print(frame)
-            print(len(frame))
+        if kinect.has_new_depth_frame() and not has_depth:
+            depth_frame = kinect.get_last_depth_frame()
+            has_depth = True
+        if kinect.has_new_color_frame() and not has_color:
+            color_frame = kinect.get_last_color_frame()
+            has_color = True
+
+        if has_depth and has_color:
             break
-        else:
-            print('No frame')
-            time.sleep(0.1)
 
     # m = kop.color_array_to_rgb_matrix(frame)
-    frame_norm = [kop.value_normalization(v, 620, 750) for v in frame]
-    m = kop.depth_array_to_matrix(frame_norm)
+    # frame_norm = [kop.value_normalization(v, 600, 900) for v in frame]
+    m_depth = kop.depth_array_to_matrix(depth_frame)
+    m_color = kop.color_array_to_rgb_matrix(color_frame)
 
-    plt.imshow(m)
+    # m = kop.convolve_edge_detect(m)
+
+    plt.imshow(m_depth)
+    plt.show()
+
+    plt.imshow(m_color)
+    cv2.imwrite('pnp.jpg', m_color)
+    
     plt.show()
