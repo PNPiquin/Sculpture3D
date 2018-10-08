@@ -6,6 +6,7 @@ import KinectOutputProcessing as kop
 import cv2
 import numpy as np
 import pickle
+from OtsuSegmentation import otsu_segmentation
 
 
 if __name__ == '__main__':
@@ -83,15 +84,7 @@ if __name__ == '__main__':
     plt.imshow(m_depth_resized)
     plt.show()
 
-    min_, max_ = kop.matrix_extremum(m_depth_resized)
-    hist, bins = np.histogram(m_depth_resized.flatten(), 256, [0, max_])
-    plt.hist(m_depth_resized.flatten(), 256, [0, max_], color='r')
-    for i in range(50, 256):
-        hist[i] = 0
-
-    m3 = np.hstack((m_depth_resized, hist))
-    plt.imshow(m3)
-    plt.show()
+    print(otsu_segmentation(m_depth_resized))
 
     quantiles = kop.matrix_quantile(m_depth_resized)
     print(quantiles)
