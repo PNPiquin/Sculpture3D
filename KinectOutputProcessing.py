@@ -24,7 +24,7 @@ def value_normalization(v, v_min=500, v_max=800):
     elif v > v_max:
         return 255
     else:
-        return 255 * (v-v_min) / (v_max - v_min)
+        return int(255 * (v-v_min) / (v_max - v_min))
 
 
 def convolve_edge_detect(img):
@@ -39,12 +39,54 @@ def submatrix_mean(mat, i1, i2, j1, j2):
         for j in range(j1, j2):
             v = mat[i][j]
             if v == 0:
-                arr += [5000]
+                pass
             else:
                 arr += [v]
 
     np_arr = np.array(arr)
     return np_arr.mean()
+
+
+def submatrix_mean_std(mat, i1, i2, j1, j2):
+    arr = []
+    for i in range(i1, i2):
+        for j in range(j1, j2):
+            v = mat[i][j]
+            if v == 0:
+                pass
+            else:
+                arr += [v]
+
+    np_arr = np.array(arr)
+    return np_arr.mean(), np_arr.std(), np_arr.min(), np_arr.max(), np.quantile(np_arr, [0.1, 0.25, 0.5, 0.75, 0.8])
+
+
+def matrix_quantile(mat):
+    arr = []
+    for i in range(0, len(mat)):
+        for j in range(0, len(mat[0])):
+            v = mat[i][j]
+            if v == 0:
+                pass
+            else:
+                arr += [v]
+
+    np_arr = np.array(arr)
+    return np.quantile(np_arr, [0.1, 0.70])
+
+
+def matrix_extremum(mat):
+    arr = []
+    for i in range(0, len(mat)):
+        for j in range(0, len(mat[0])):
+            v = mat[i][j]
+            if v == 0:
+                pass
+            else:
+                arr += [v]
+
+    np_arr = np.array(arr)
+    return np_arr.min(), np_arr.max()
 
 
 def fin_min_mean(mat, depth=3, width=512, height=424):
@@ -74,3 +116,11 @@ def fin_min_mean(mat, depth=3, width=512, height=424):
         j2 = tmp_j1 + 2 * j_step
 
     return i1, i2, j1, j2
+
+
+def resize_matrix(mat, x1, x2, y1, y2):
+    res = [[] for _ in range(y2 - y1)]
+    for j in range(y1, y2):
+        for i in range(x1, x2):
+            res[j - y1] += [mat[j][i]]
+    return np.array(res)
