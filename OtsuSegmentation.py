@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 def otsu_segmentation(mat):
     min_, max_ = kop.matrix_extremum(mat)
     hist, bins = np.histogram(mat.flatten(), 256, [0, max_])
+    hist[0] = 0
     plt.hist(mat.flatten(), 256, [0, max_])
     plt.show()
 
@@ -23,7 +24,10 @@ def otsu_segmentation(mat):
 
     between_class_variances = {}
     for k in range(1, 256):
-        between_class_variances[k] = (mean_global * p1_k[k] - mean_k[k])**2 / (p1_k[k] * (1 - p1_k[k]))
+        try:
+            between_class_variances[k] = (mean_global * p1_k[k] - mean_k[k])**2 / (p1_k[k] * (1 - p1_k[k]))
+        except:
+            print(k)
 
     k_max = 0
     var_max = 0

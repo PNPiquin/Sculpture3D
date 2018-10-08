@@ -1,84 +1,41 @@
-from pykinect2 import PyKinectV2
-from pykinect2 import PyKinectRuntime
-import time
 import matplotlib.pyplot as plt
-import KinectOutputProcessing as kop
 import cv2
-import numpy as np
 import pickle
+
+import KinectOutputProcessing as kop
 from OtsuSegmentation import otsu_segmentation
+from KinectIO import get_depth_and_color_frame
+from FaceRecognition import face_recognition
+
+WITH_KINECT = False
 
 
 if __name__ == '__main__':
-    print('Coucou')
-    kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Color)
-    color_frame = []
-    depth_frame = []
-    has_depth = False
-    has_color = False
-    while True:
-        if kinect.has_new_depth_frame() and not has_depth:
-            depth_frame = kinect.get_last_depth_frame()
-            has_depth = True
-        if kinect.has_new_color_frame() and not has_color:
-            color_frame = kinect.get_last_color_frame()
-            has_color = True
+    if WITH_KINECT:
+        depth_frame, color_frame = get_depth_and_color_frame()
 
-        if has_depth and has_color:
-            break
+        # pickle.dump(depth_frame, open('depth_frame.pck', 'wb'))
+        # pickle.dump(color_frame, open('color_frame.pck', 'wb'))
+    else:
+        depth_frame = pickle.load(open('depth_frame.pck', 'rb'))
+        color_frame = pickle.load(open('color_frame.pck', 'rb'))
 
-    pickle.dump(depth_frame, open('depth_frame.pck', 'wb'))
-    pickle.dump(color_frame, open('color_frame.pck', 'wb'))
-
-    # m = kop.color_array_to_rgb_matrix(frame)
-    # frame_norm = [kop.value_normalization(v, 400, 1000) for v in depth_frame]
+    # depth matrix creation
     m_depth = kop.depth_array_to_matrix(depth_frame)
 
     # RGB matrix creation
     m_color = kop.color_array_to_rgb_matrix(color_frame)
 
-    face_model = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
-    faces = face_model.detectMultiScale(m_color)
+    x1, x2, y1, y2 = face_recognition(m_color=m_color)
 
-    # color img dimensions
-    color_width = 1920
-    color_height = 1080
+    cv2.rectangle(m_depth, (x1, y1), (x2, y2), (255, 0, 0), 3)
+    print('(x1, y1) = ({}, {})'.format(x1, y1))
+    print('(x2, y2) = ({}, {})'.format(x2, y2))
 
-    # depth image dimensions
-    depth_width = 512
-    depth_height = 424
+    # plt.imshow(m_depth)
+    # plt.show()
 
-    offset = 100
-    norm_0 = -1
-    x1_ = 0
-    x2_ = 0
-    y1_ = 0
-    y2_ = 0
-
-    for face in faces:
-        x1 = int(((face[0] - offset) / color_width) * depth_width)
-        y1 = int(((face[1] - offset) / color_height) * depth_height)
-
-        x2 = int(((face[0] + face[2] + offset) / color_width) * depth_width)
-        y2 = int(((face[1] + face[3] + offset) / color_height) * depth_height)
-
-        norm = pow((x2 - x1), 2) + pow((y2 - y1), 2)
-        if norm > norm_0:
-            norm_0 = norm
-            x1_ = x1
-            x2_ = x2
-            y1_ = y1
-            y2_ = y2
-
-    cv2.rectangle(m_depth, (x1_, y1_), (x2_, y2_), (255, 0, 0), 3)
-    print('(x1, y1) = ({}, {})'.format(x1_, y1_))
-    print('(x2, y2) = ({}, {})'.format(x2_, y2_))
-    print(kop.submatrix_mean_std(m_depth, x1_, x2_, y1_, y2_))
-
-    plt.imshow(m_depth)
-    plt.show()
-
-    m_depth_resized = kop.resize_matrix(m_depth, x1_, x2_, y1_, y2_)
+    m_depth_resized = kop.resize_matrix(m_depth, x1, x2, y1, y2)
     m_2 = m_depth_resized.copy()
 
     plt.imshow(m_depth_resized)
