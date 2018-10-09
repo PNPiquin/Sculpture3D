@@ -58,7 +58,7 @@ def submatrix_mean_std(mat, i1, i2, j1, j2, max_value=10000):
                 arr += [v]
 
     np_arr = np.array(arr)
-    return np_arr.mean(), np_arr.std(), np_arr.min(), np_arr.max(), np.quantile(np_arr, [0.1, 0.25, 0.5, 0.75, 0.8])
+    return np_arr.mean(), np_arr.std()
 
 
 def matrix_quantile(mat, max_value=10000):

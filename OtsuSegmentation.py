@@ -36,7 +36,6 @@ def otsu_segmentation(mat):
         else:
             between_class_variances[k] = 0
 
-    print(between_class_variances)
     k_max = 0
     var_max = 0
     for k in range(1, 256):
