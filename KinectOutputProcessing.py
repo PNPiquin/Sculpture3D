@@ -47,12 +47,12 @@ def submatrix_mean(mat, i1, i2, j1, j2):
     return np_arr.mean()
 
 
-def submatrix_mean_std(mat, i1, i2, j1, j2):
+def submatrix_mean_std(mat, i1, i2, j1, j2, max_value=10000):
     arr = []
     for i in range(i1, i2):
         for j in range(j1, j2):
             v = mat[i][j]
-            if v == 0:
+            if v == 0 or v > max_value:
                 pass
             else:
                 arr += [v]
@@ -72,7 +72,7 @@ def matrix_quantile(mat, max_value=10000):
                 arr += [v]
 
     np_arr = np.array(arr)
-    return np.quantile(np_arr, [0.2, 0.95])
+    return np.quantile(np_arr, [0.1, 0.95])
 
 
 def matrix_extremum(mat):
