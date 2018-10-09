@@ -16,10 +16,9 @@ def generate_pointcloud(depth_img, output_file='cloudpoint.txt'):
     points = []    
     for v in range(len(depth_img)):
         for u in range(len(depth_img[0])):
+            if depth_img[v][u] == 255:
+                continue
             z = depth_img[v][u] / scalingFactor
-#            if Z==0: continue
-#            X = (u - centerX) * z / focalLength
-#            Y = (v - centerY) * z / focalLength
             points += [[u, v, z]]
 
     with open(output_file, 'w') as f:
