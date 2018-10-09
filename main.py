@@ -8,8 +8,9 @@ from KinectIO import get_depth_and_color_frame
 from FaceRecognition import face_recognition
 from ImageEnhancement import image_enhancement, image_opening
 from Greys2PointsCloud import generate_pointcloud
+from FaceSegmentation import face_segmentation
 
-WITH_KINECT = True
+WITH_KINECT = False
 
 
 if __name__ == '__main__':
@@ -41,8 +42,8 @@ if __name__ == '__main__':
     m_2 = m_depth_resized.copy()
     m_3 = m_depth_resized.copy()
 
-    plt.imshow(m_depth_resized)
-    plt.show()
+    # plt.imshow(m_depth_resized)
+    # plt.show()
 
     otsu_thresh = otsu_segmentation(m_depth_resized)
     print('otsu_thresh --> {}'.format(otsu_thresh))
@@ -80,10 +81,14 @@ if __name__ == '__main__':
     plt.imshow(m_4, cmap='Greys')
     cv2.imwrite('depth_face.jpg', m_4)
 
-    m_5 = image_enhancement(image_enhancement(m_4))
-    # fig.add_subplot(1, 3, 3)
-    # plt.imshow(m_5, cmap='Greys')
-    cv2.imwrite('depth_face_2.jpg', m_5)
+    cut_index = face_segmentation(m_4)
+    m_7 = kop.resize_matrix(m_4, 0, len(m_4[0]), 0, cut_index)
+
+    m_5 = image_enhancement(image_enhancement(m_7))
+    m_5 = cv2.blur(m_5, (5, 5))
+    fig.add_subplot(1, 3, 3)
+    plt.imshow(m_5, cmap='Greys')
+    # cv2.imwrite('depth_face_2.jpg', m_5)
     plt.show()
 
     generate_pointcloud(m_5, 'cloud.txt')

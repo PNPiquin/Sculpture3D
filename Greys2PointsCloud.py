@@ -6,10 +6,10 @@ Created on Tue Oct  9 09:27:27 2018
 """
 
 
-focalLength = 50
+focalLength = 1
 centerX = 75
 centerY = 51
-scalingFactor = 5
+scalingFactor = 1.5
 
 
 def generate_pointcloud(depth_img, output_file='cloudpoint.txt'):
