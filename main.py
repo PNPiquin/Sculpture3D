@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 import cv2
 import pickle
-import numpy as np
 
 import KinectOutputProcessing as kop
 from OtsuSegmentation import otsu_segmentation
 from KinectIO import get_depth_and_color_frame
 from FaceRecognition import face_recognition
-from ImageEnhancement import image_enhancement, image_opening, subtract_grad
+from ImageEnhancement import image_enhancement, image_opening
+from Greys2PointsCloud import generate_pointcloud
 
 WITH_KINECT = True
 
@@ -41,11 +41,12 @@ if __name__ == '__main__':
     m_2 = m_depth_resized.copy()
     m_3 = m_depth_resized.copy()
 
-    # plt.imshow(m_depth_resized)
-    # plt.show()
+    plt.imshow(m_depth_resized)
+    plt.show()
 
     otsu_thresh = otsu_segmentation(m_depth_resized)
-    print(otsu_thresh)
+    print('otsu_thresh --> {}'.format(otsu_thresh))
+    otsu_thresh = min(otsu_thresh, 1500)
 
     # quantiles = kop.matrix_quantile(m_depth_resized, max_value=otsu_thresh)
     # print(quantiles)
@@ -84,3 +85,5 @@ if __name__ == '__main__':
     # plt.imshow(m_5, cmap='Greys')
     cv2.imwrite('depth_face_2.jpg', m_5)
     plt.show()
+
+    generate_pointcloud(m_5, 'cloud.txt')
