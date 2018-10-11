@@ -45,4 +45,8 @@ def otsu_segmentation(mat):
             var_max = between_class_variances[k]
             k_max = k
 
+    plt.plot([i for i in range(256)], hist)
+    plt.axvline(x=k_max, color='r')
+    plt.show()
+
     return k_max * max_ / 256

@@ -1,4 +1,5 @@
 import cv2
+import os
 
 
 def face_recognition(m_color):
@@ -27,6 +28,8 @@ def face_recognition(m_color):
         x2 = int(((face[0] + face[2] + offset) / color_width) * depth_width)
         y2 = int(((face[1] + face[3] + offset) / color_height) * depth_height)
 
+        cv2.rectangle(m_color, (face[0], face[1]), (face[0] + face[2], face[1] + face[3]), (255, 0, 0), 3)
+
         norm = pow((x2 - x1), 2) + pow((y2 - y1), 2)
         if norm > norm_0:
             norm_0 = norm
@@ -34,5 +37,7 @@ def face_recognition(m_color):
             x2_ = x2
             y1_ = y1
             y2_ = y2
+
+    cv2.imwrite(os.path.join('Presentation', 'faces.jpg'), m_color[...,::-1])
 
     return x1_, x2_, y1_, y2_

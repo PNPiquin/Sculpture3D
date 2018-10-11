@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import cv2
 import pickle
 import numpy as np
+import os
 
 import KinectOutputProcessing as kop
 from OtsuSegmentation import otsu_segmentation
@@ -10,10 +11,13 @@ from FaceRecognition import face_recognition
 from ImageEnhancement import image_enhancement, image_opening
 from Greys2PointsCloud import generate_pointcloud
 from FaceSegmentation import face_segmentation, face_histogram_detection
+from StyleEffects import cubist_grid, cubist_grid_with_ramp
 
 WITH_KINECT = False
 SAVE_RAW_IMAGES = False
-SAVE_TMP_IMAGES = False
+SAVE_TMP_IMAGES = True
+
+presentation_path = os.path.join('.', 'Presentation')
 
 
 if __name__ == '__main__':
@@ -24,20 +28,27 @@ if __name__ == '__main__':
             pickle.dump(depth_frame, open('depth_frame_chloe.pck', 'wb'))
             pickle.dump(color_frame, open('color_frame_chloe.pck', 'wb'))
     else:
-        depth_frame = pickle.load(open('depth_frame_chloe.pck', 'rb'))
-        color_frame = pickle.load(open('color_frame_chloe.pck', 'rb'))
+        depth_frame = pickle.load(open('depth_frame.pck', 'rb'))
+        color_frame = pickle.load(open('color_frame.pck', 'rb'))
 
     # depth matrix creation
     m_depth = kop.depth_array_to_matrix(depth_frame)
+    if SAVE_TMP_IMAGES:
+        cv2.imwrite(os.path.join(presentation_path, 'depth_image.jpg'), m_depth)
 
     # RGB matrix creation
     m_color = kop.color_array_to_rgb_matrix(color_frame)
+    if SAVE_TMP_IMAGES:
+        cv2.imwrite(os.path.join(presentation_path, 'color_image.jpg'), m_color[...,::-1])
 
     x1, x2, y1, y2 = face_recognition(m_color=m_color)
 
     m_depth_resized = kop.resize_matrix(m_depth, x1, x2, y1, y2)
     m_2 = m_depth_resized.copy()
     m_3 = m_depth_resized.copy()
+
+    if SAVE_TMP_IMAGES:
+        cv2.imwrite(os.path.join(presentation_path, 'depth_resized.jpg'), m_depth_resized)
 
     # plt.imshow(m_depth_resized, cmap='Greys')
     # plt.show()
@@ -80,7 +91,8 @@ if __name__ == '__main__':
 
     m_4 = image_opening(m_3)
     if SAVE_TMP_IMAGES:
-        cv2.imwrite('depth_face.jpg', m_4)
+        cv2.imwrite(os.path.join(presentation_path, 'depth_face_without_opening.jpg'), m_3)
+        cv2.imwrite(os.path.join(presentation_path, 'depth_face.jpg'), m_4)
 
     cut_index = face_segmentation(m_4)
     m_7 = kop.resize_matrix(m_4, 0, len(m_4[0]), 0, cut_index)
@@ -88,8 +100,9 @@ if __name__ == '__main__':
     m_6_ = cv2.bilateralFilter(m_7.astype(np.uint8), 5, 120, 80)
     m_6 = image_enhancement(image_enhancement(m_6_))
 
-    m_5 = image_enhancement(image_enhancement(m_7))
-    m_8 = cv2.blur(m_5, (11, 11))
+    if SAVE_TMP_IMAGES:
+        cv2.imwrite(os.path.join(presentation_path, 'cut_depth_face.jpg'), m_7)
+        cv2.imwrite(os.path.join(presentation_path, 'final_depth_face.jpg'), m_6)
 
     # plotting some images to monitor the process
     fig = plt.figure(figsize=(1, 3))
@@ -97,8 +110,12 @@ if __name__ == '__main__':
     plt.imshow(m_7, cmap='Greys')
     fig.add_subplot(1, 3, 2)
     plt.imshow(m_6, cmap='Greys')
+
+    m_cubist = cubist_grid_with_ramp(m_6, grid_size=15)
+
     fig.add_subplot(1, 3, 3)
-    plt.imshow(m_8, cmap='Greys')
+    plt.imshow(m_cubist, cmap='Greys')
     plt.show()
 
     generate_pointcloud(m_6, 'cloud_bilateral.txt')
+    generate_pointcloud(m_cubist, 'cloud_cubist.txt')

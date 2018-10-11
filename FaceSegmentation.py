@@ -14,9 +14,6 @@ def face_segmentation(img, offset=5):
             acu += v
         hist[j] = acu/width
 
-    # plt.plot(abs, hist)
-    # plt.show()
-
     start_index = int(height/2)
     max = 0
     index = start_index
@@ -24,6 +21,14 @@ def face_segmentation(img, offset=5):
         if hist[j] > max:
             max = hist[j]
             index = j
+
+    # plt.plot(abs, hist)
+    # plt.axvline(x=index, color='r')
+    # plt.show()
+    #
+    # plt.plot(hist, abs[::-1])
+    # plt.axhline(y=height-index, color='r')
+    # plt.show()
 
     return min(index + 5, height)
 
@@ -60,6 +65,8 @@ def face_histogram_detection(img, otsu_thresh):
             k_2 = k
             break
 
-    # plt.hist(tmp_img.flatten(), 256, [0, otsu_thresh])
+    # plt.plot(bins[:256], hist)
+    # plt.axvline(x=bins[k_1], color='r')
+    # plt.axvline(x=bins[k_2], color='r')
     # plt.show()
     return int(bins[k_1-1]), int(bins[k_2+1])
