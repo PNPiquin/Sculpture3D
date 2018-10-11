@@ -19,6 +19,13 @@ SAVE_TMP_IMAGES = True
 
 presentation_path = os.path.join('.', 'Presentation')
 
+# color img dimensions
+color_width = 1920
+color_height = 1080
+
+# depth image dimensions
+depth_width = 512
+depth_height = 424
 
 if __name__ == '__main__':
     if WITH_KINECT:
@@ -39,9 +46,19 @@ if __name__ == '__main__':
     # RGB matrix creation
     m_color = kop.color_array_to_rgb_matrix(color_frame)
     if SAVE_TMP_IMAGES:
-        cv2.imwrite(os.path.join(presentation_path, 'color_image.jpg'), m_color[...,::-1])
+        cv2.imwrite(os.path.join(presentation_path, 'color_image.jpg'), m_color[..., ::-1])
 
-    x1, x2, y1, y2 = face_recognition(m_color=m_color)
+    x1, x2, y1, y2, face = face_recognition(m_color=m_color)
+
+    if SAVE_TMP_IMAGES:
+        m_color_resize = kop.resize_matrix(
+            m_color,
+            face[0] - 100,
+            face[0] + face[2] + 100,
+            face[1] - 100,
+            face[1] + face[3] + 100
+        )
+        cv2.imwrite(os.path.join(presentation_path, 'color_face.jpg'), m_color_resize[..., ::-1])
 
     m_depth_resized = kop.resize_matrix(m_depth, x1, x2, y1, y2)
     m_2 = m_depth_resized.copy()
@@ -97,12 +114,24 @@ if __name__ == '__main__':
     cut_index = face_segmentation(m_4)
     m_7 = kop.resize_matrix(m_4, 0, len(m_4[0]), 0, cut_index)
 
+    # if SAVE_TMP_IMAGES:
+    #     m_color_resize_cut = kop.resize_matrix(
+    #         m_color,
+    #         face[0] - 100,
+    #         face[0] + face[2] + 100,
+    #         face[1] - 100,
+    #         face[1] - 100 + int(cut_index / len(m_depth_resized) * (face[3] + 250))
+    #     )
+    #     cv2.imwrite(os.path.join(presentation_path, 'color_face_cut.jpg'), m_color_resize_cut[..., ::-1])
+
     m_6_ = cv2.bilateralFilter(m_7.astype(np.uint8), 5, 120, 80)
     m_6 = image_enhancement(image_enhancement(m_6_))
 
     if SAVE_TMP_IMAGES:
         cv2.imwrite(os.path.join(presentation_path, 'cut_depth_face.jpg'), m_7)
         cv2.imwrite(os.path.join(presentation_path, 'final_depth_face.jpg'), m_6)
+        back_to_rgb = cv2.cvtColor(m_6,cv2.COLOR_GRAY2RGB)
+        cv2.imwrite(os.path.join(presentation_path, 'rgb_final_depth_face.jpg'), back_to_rgb)
 
     # plotting some images to monitor the process
     fig = plt.figure(figsize=(1, 3))
@@ -111,7 +140,7 @@ if __name__ == '__main__':
     fig.add_subplot(1, 3, 2)
     plt.imshow(m_6, cmap='Greys')
 
-    m_cubist = cubist_grid_with_ramp(m_6, grid_size=15)
+    m_cubist = cubist_grid_with_ramp(m_6, grid_size=10)
 
     fig.add_subplot(1, 3, 3)
     plt.imshow(m_cubist, cmap='Greys')
