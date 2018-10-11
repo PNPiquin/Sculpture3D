@@ -65,8 +65,8 @@ def face_histogram_detection(img, otsu_thresh):
             k_2 = k
             break
 
-    # plt.plot(bins[:256], hist)
-    # plt.axvline(x=bins[k_1], color='r')
-    # plt.axvline(x=bins[k_2], color='r')
+    # plt.plot([i for i in range(256)], hist)
+    # plt.axvline(x=k_1, color='r')
+    # plt.axvline(x=k_2, color='r')
     # plt.show()
     return int(bins[k_1-1]), int(bins[k_2+1])
