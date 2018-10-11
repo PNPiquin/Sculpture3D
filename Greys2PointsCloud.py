@@ -14,6 +14,13 @@ scalingFactor = 1.5
 
 
 def generate_pointcloud(depth_img, output_file='cloudpoint.txt', image_file=None):
+    """Generate a pointcloud in txt format
+
+    :param depth_img: source image
+    :param output_file: path to output file
+    :param image_file: image to add rgb information to the output. If None, create a simple point cloud
+    :return:
+    """
     points = []
     if image_file:
         color_img = cv2.imread(image_file)

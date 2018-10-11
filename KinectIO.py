@@ -3,6 +3,10 @@ from pykinect2 import PyKinectRuntime
 
 
 def get_depth_and_color_frame():
+    """Fetch both color and depth image from the Kinect V2
+
+    :return: (1D array, 1D array) (depth_frame, color_frame)
+    """
     kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Color)
     color_frame = []
     depth_frame = []

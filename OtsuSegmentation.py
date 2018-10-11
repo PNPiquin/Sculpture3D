@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 
 
 def otsu_segmentation(mat):
+    """Process an Otsu segmentation to find the face value range in the depth image
+
+    :param mat: input image
+    :return: (float) --> threshold to separate the face from the background
+    """
     min_, max_ = kop.matrix_extremum(mat)
     hist, bins = np.histogram(mat.flatten(), 256, [0, max_])
     # plt.hist(mat.flatten(), 256, [0, max_])
