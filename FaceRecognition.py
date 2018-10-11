@@ -3,6 +3,11 @@ import os
 
 
 def face_recognition(m_color):
+    """Search for a face in a bgr image
+
+    :param m_color: color image
+    :return: (int, int, int, int) : (x1, x2, y1, y2) --> face contained between (x1, y1) and (x2, y2)
+    """
     m_color_ = m_color.copy()
     face_model = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
     faces = face_model.detectMultiScale(m_color)

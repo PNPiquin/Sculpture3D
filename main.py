@@ -15,7 +15,7 @@ from StyleEffects import cubist_grid, cubist_grid_with_ramp
 
 WITH_KINECT = False
 SAVE_RAW_IMAGES = False
-SAVE_TMP_IMAGES = True
+SAVE_TMP_IMAGES = False
 
 presentation_path = os.path.join('.', 'Presentation')
 

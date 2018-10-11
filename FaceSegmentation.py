@@ -3,10 +3,16 @@ import numpy as np
 
 
 def face_segmentation(img, offset=5):
+    """Search along the y-axis the limit between the face and the torso
+
+    :param img: face image in which we want to cut off the torso
+    :param offset: (in px) offset to lower the cutting point in the neck
+    :return: (int) the index to cut the image
+    """
     height = len(img)
     width = len(img[0])
     hist = [[] for _ in range(height)]
-    abs = [i for i in range(height)]
+
     for j in range(height):
         acu = 0
         for i in range(width):
@@ -22,18 +28,22 @@ def face_segmentation(img, offset=5):
             max = hist[j]
             index = j
 
+    # Plot instruction
+    # abs = [i for i in range(height)]
     # plt.plot(abs, hist)
     # plt.axvline(x=index, color='r')
     # plt.show()
-    #
-    # plt.plot(hist, abs[::-1])
-    # plt.axhline(y=height-index, color='r')
-    # plt.show()
 
-    return min(index + 5, height)
+    return min(index + offset, height)
 
 
 def face_histogram_detection(img, otsu_thresh):
+    """Detect the range of pixel values on the face (on the only object in front)
+
+    :param img: face img
+    :param otsu_thresh: threshold obtained by an Otsu segmentation to consider only objects in the front
+    :return: (int, int) range (v_min, v_max)
+    """
     tmp_img = img.copy()
     height = len(img)
     width = len(img[0])
@@ -65,8 +75,9 @@ def face_histogram_detection(img, otsu_thresh):
             k_2 = k
             break
 
-    # plt.plot(bins[:256], hist)
-    # plt.axvline(x=bins[k_1], color='r')
-    # plt.axvline(x=bins[k_2], color='r')
+    # Plot instruction
+    # plt.plot([i for i in range(256)], hist)
+    # plt.axvline(x=k_1, color='r')
+    # plt.axvline(x=k_2, color='r')
     # plt.show()
     return int(bins[k_1-1]), int(bins[k_2+1])

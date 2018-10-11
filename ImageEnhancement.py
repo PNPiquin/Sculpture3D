@@ -3,6 +3,11 @@ import cv2
 
 
 def image_enhancement(img):
+    """Double the width and the height of the input image by simple interpolation
+
+    :param img: input image
+    :return: the interpolated image
+    """
     new_img = []
     height = len(img)
     width = len(img[0])
@@ -23,7 +28,14 @@ def image_enhancement(img):
     return np.array(new_img)
 
 
-def image_opening(img, c=0.5, thresh=225):
+def image_opening(img, c=0.7, thresh=225):
+    """Process an opening on the image to reconstruct the eyes
+
+    :param img: input image
+    :param c: (float) (0 < c < 1) weight to give to the mask image (img after opening)
+    :param thresh: (int) background threshold
+    :return: the processed image
+    """
     er_img = cv2.dilate(img, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
     open_img = cv2.morphologyEx(er_img, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7)), iterations=1)
     new_img = img.copy()
@@ -36,6 +48,12 @@ def image_opening(img, c=0.5, thresh=225):
 
 
 def subtract_grad(img, thresh=40):
+    """NOT USED
+
+    :param img:
+    :param thresh:
+    :return:
+    """
     grad = cv2.morphologyEx(img, cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
     new_img = img.copy()
     for j in range(len(img)):
